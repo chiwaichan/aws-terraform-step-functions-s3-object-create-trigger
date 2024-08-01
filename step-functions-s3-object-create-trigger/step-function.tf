@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "step_functions_policy_attachment" {
   policy_arn = aws_iam_policy.step_functions_policy.arn
 }
 
-data "aws_iam_policy_document" "example" {
+data "aws_iam_policy_document" "step_functions_policy" {
   statement {
     actions = ["lambda:InvokeFunction"]
 
@@ -54,16 +54,16 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
     
     
     {
-  "StartAt": "Check Stock Price",
+  "StartAt": "Extract Document using Textract",
   "States": {
-    "Check Stock Price": {
+    "Extract Document using Textract": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:ap-southeast-2:177522612043:function:StepFunctionsSample-HelloLam-CheckStockPriceLambda-Df2WQbkm6nrJ",
-      "Next": "Generate Buy/Sell recommendation"
+      "Resource": "${aws_lambda_function.lambda_extract_using_textract.arn}",
+      "Next": "Extract Document using Bedrock"
     },
-    "Generate Buy/Sell recommendation": {
+    "Extract Document using Bedrock": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:ap-southeast-2:177522612043:function:StepFunctionsSample-Hello-GenerateBuySellRecommend-fgqcPtTxSdz9",
+      "Resource": "${aws_lambda_function.lambda_extract_using_bedrock.arn}",
       "ResultPath": "$.recommended_type",
       "Next": "Request Human Approval"
     },
