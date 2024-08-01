@@ -1,3 +1,64 @@
+resource "aws_iam_role" "lambda_role_determine_processing_file_type" {
+  name = "lambda-role-determine-processing-file-type"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_attachment_determine_processing_file_type" {
+  role       = aws_iam_role.lambda_role_determine_processing_file_type.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+data "archive_file" "lambda_zip_determine_processing_file_type" {
+  type        = "zip"
+  source_file = "${path.module}/lambdas/determine-processing-file-type/index.py"
+  output_path = "${path.module}/lambdas/determine-processing-file-type/index.zip"
+}
+
+resource "aws_lambda_function" "lambda_determine_processing_file_type" {
+  filename         = data.archive_file.lambda_zip_determine_processing_file_type.output_path
+  function_name    = "lambda_determine_processing_file_type"
+  role             = aws_iam_role.lambda_role_determine_processing_file_type.arn
+  handler          = "index.lambda_handler"
+  runtime          = "python3.8"
+  source_code_hash = filebase64sha256(data.archive_file.lambda_zip_determine_processing_file_type.output_path)
+
+  environment {
+    variables = {
+      ENV_VAR = "value"
+    }
+  }
+}
+
+output "lambda_function_determine_processing_file_type_arn" {
+  value = aws_lambda_function.lambda_determine_processing_file_type.arn
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 resource "aws_iam_role" "lambda_role_extract_using_textract" {
   name = "lambda-role-extract-using-textract"
 
