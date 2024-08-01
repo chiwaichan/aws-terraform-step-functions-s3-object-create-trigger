@@ -61,6 +61,13 @@ resource "aws_lambda_function" "lambda_start_step_function_execution" {
   handler       = "index.handler"
   runtime       = "python3.8"
   filename      = "lambdas/do-nothing-function.zip"  # Path to your Lambda deployment package
+
+  environment {
+    variables = {
+      STEP_FUNCTIONS_ARN = aws_sfn_state_machine.document_processing_state_machine.arn
+      ANOTHER_VARIABLE   = "value"
+    }
+  }
 }
 
 # S3 Bucket Notification
