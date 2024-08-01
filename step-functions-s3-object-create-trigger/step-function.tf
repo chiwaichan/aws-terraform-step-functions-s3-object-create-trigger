@@ -54,8 +54,34 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
     
     
     {
-  "StartAt": "Extract Document using Textract",
+  "StartAt": "Determine Processing File Type",
   "States": {
+    "Determine Processing File Type": {
+      "Type": "Task",
+      "Resource": "${aws_lambda_function.lambda_determine_processing_file_type.arn}",
+      "Next": "DetermineNextStepFileType"
+    },
+    "DetermineNextStepFileType": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.next_step_file_type",
+          "StringEquals": "EXCEL",
+          "Next": "Extract Tables from Excel"
+        },
+        {
+          "Variable": "$.next_step_file_type",
+          "StringEquals": "PDF",
+          "Next": "Extract Document using Textract"
+        }
+      ],
+      "Default": "Extract Document using Textract"
+    },
+    "Extract Tables from Excel": {
+      "Type": "Task",
+      "Resource": "${aws_lambda_function.lambda_extract_tables_from_excel.arn}",
+      "Next": "Extract Document using Bedrock"
+    },
     "Extract Document using Textract": {
       "Type": "Task",
       "Resource": "${aws_lambda_function.lambda_extract_using_textract.arn}",
