@@ -30,7 +30,7 @@ resource "aws_lambda_function" "lambda_extract_using_textract" {
   filename         = data.archive_file.lambda_zip_extract_using_textract.output_path
   function_name    = "lambda_extract_using_textract"
   role             = aws_iam_role.lambda_role_extract_using_textract.arn
-  handler          = "lambda_function.lambda_handler"
+  handler          = "index.lambda_handler"
   runtime          = "python3.8"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip_extract_using_textract.output_path)
 
@@ -91,7 +91,7 @@ resource "aws_lambda_function" "lambda_extract_using_bedrock" {
   filename         = data.archive_file.lambda_zip_extract_using_bedrock.output_path
   function_name    = "lambda_extract_using_bedrock"
   role             = aws_iam_role.lambda_role_extract_using_bedrock.arn
-  handler          = "lambda_function.lambda_handler"
+  handler          = "index.lambda_handler"
   runtime          = "python3.8"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip_extract_using_bedrock.output_path)
 
