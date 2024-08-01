@@ -49,6 +49,13 @@ resource "aws_iam_role_policy" "lambda_policy_step_function_execution" {
           aws_s3_bucket.source_document_bucket.arn,
           "${aws_s3_bucket.source_document_bucket.arn}/*"
         ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": "states:StartExecution",
+        "Resource": [
+          aws_sfn_state_machine.document_processing_state_machine.arn
+        ]
       }
     ]
   })
