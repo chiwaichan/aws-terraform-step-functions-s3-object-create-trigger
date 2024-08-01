@@ -54,17 +54,24 @@ resource "aws_iam_role_policy" "lambda_policy_step_function_execution" {
   })
 }
 
+data "archive_file" "lambda_zip_start_step_function_execution" {
+  type        = "zip"
+  source_file = "${path.module}/lambdas/start-step-function-execution/index.py"
+  output_path = "${path.module}/lambdas/start-step-function-execution/index.zip"
+}
+
 # Lambda Function
 resource "aws_lambda_function" "lambda_start_step_function_execution" {
-  function_name = "lambda_start_step_function_execution"
-  role          = aws_iam_role.lambda_role_start_step_function_execution.arn
-  handler       = "index.handler"
-  runtime       = "python3.8"
-  filename      = "lambdas/do-nothing-function.zip"  # Path to your Lambda deployment package
+  filename         = data.archive_file.lambda_zip_start_step_function_execution.output_path
+  function_name    = "lambda_start_step_function_execution"
+  role             = aws_iam_role.lambda_role_start_step_function_execution.arn
+  handler          = "index.lambda_handler"
+  runtime          = "python3.8"
+  source_code_hash = filebase64sha256(data.archive_file.lambda_zip_start_step_function_execution.output_path)
 
   environment {
     variables = {
-      STEP_FUNCTIONS_ARN = aws_sfn_state_machine.document_processing_state_machine.arn
+      STEP_FUNCTION_ARN = aws_sfn_state_machine.document_processing_state_machine.arn
       ANOTHER_VARIABLE   = "value"
     }
   }

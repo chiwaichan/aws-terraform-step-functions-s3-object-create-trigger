@@ -53,6 +53,12 @@ output "lambda_function_extract_using_textract_arn" {
 
 
 
+
+
+
+
+
+
 resource "aws_iam_role" "lambda_role_extract_using_bedrock" {
   name = "lambda-role-extract-using-bedrock"
 
