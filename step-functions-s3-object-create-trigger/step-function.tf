@@ -78,7 +78,7 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
         "Extract Tables from Excel": {
           "Type": "Task",
           "Resource": "${aws_lambda_function.lambda_extract_tables_from_excel.arn}",
-          "Next": "Request Human Approval"
+          "Next": "Report Result"
         },
         "Gather Document Details": {
           "Type": "Task",
@@ -109,46 +109,9 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
               }
             }
           ],
-          "Next": "Request Human Approval"
-        },
-        "Request Human Approval": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
-          "Parameters": {
-            "QueueUrl": "https://sqs.ap-southeast-2.amazonaws.com/177522612043/StepFunctionsSample-HelloLambda-13b053f3-12-RequestHumanApprovalSqs-2qNTsZIqmdrp",
-            "MessageBody": {
-              "Input.$": "$",
-              "TaskToken.$": "$$.Task.Token"
-            }
-          },
-          "ResultPath": null,
-          "Next": "Buy or Sell?"
-        },
-        "Buy or Sell?": {
-          "Type": "Choice",
-          "Choices": [
-            {
-              "Variable": "$.recommended_type",
-              "StringEquals": "buy",
-              "Next": "Buy Stock"
-            },
-            {
-              "Variable": "$.recommended_type",
-              "StringEquals": "sell",
-              "Next": "Sell Stock"
-            }
-          ]
-        },
-        "Buy Stock": {
-          "Type": "Task",
-          "Resource": "arn:aws:lambda:ap-southeast-2:177522612043:function:StepFunctionsSample-HelloLambda-13b-BuyStockLambda-EW7XjLysUqaz",
           "Next": "Report Result"
         },
-        "Sell Stock": {
-          "Type": "Task",
-          "Resource": "arn:aws:lambda:ap-southeast-2:177522612043:function:StepFunctionsSample-HelloLambda-13-SellStockLambda-6vJsjH8oioBR",
-          "Next": "Report Result"
-        },
+       
         "Report Result": {
           "Type": "Task",
           "Resource": "arn:aws:states:::sns:publish",
