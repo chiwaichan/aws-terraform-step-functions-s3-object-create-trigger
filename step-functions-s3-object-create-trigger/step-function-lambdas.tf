@@ -34,11 +34,11 @@ resource "aws_lambda_function" "lambda_determine_processing_file_type" {
   runtime          = "python3.8"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip_determine_processing_file_type.output_path)
 
-  environment {
-    variables = {
-      SOURCE_DOCUMENT_S3_BUCKET = aws_s3_bucket.source_document_bucket.bucket
-    }
-  }
+  # environment {
+  #   variables = {
+  #     SOURCE_DOCUMENT_S3_BUCKET = aws_s3_bucket.source_document_bucket.bucket
+  #   }
+  # }
 }
 
 output "lambda_function_determine_processing_file_type_arn" {
