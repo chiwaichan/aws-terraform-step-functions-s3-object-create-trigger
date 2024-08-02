@@ -7,8 +7,10 @@ def lambda_handler(event, context):
     # Determine the file extension and set next_step_file_type accordingly
     if source_document.endswith((".xlsx", ".xls", ".xlsm", ".xlsb", ".xltx", ".xltm")):
         next_step_file_type = "EXCEL"
+        event["file_type"] = "EXCEL"
     elif source_document.endswith(".pdf"):
         next_step_file_type = "PDF"
+        event["file_type"] = "PDF"
     else:
         next_step_file_type = "UNKNOWN"
     
