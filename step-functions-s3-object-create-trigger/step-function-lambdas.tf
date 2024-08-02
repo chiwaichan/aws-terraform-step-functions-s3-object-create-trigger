@@ -31,7 +31,7 @@ resource "aws_lambda_function" "lambda_determine_processing_file_type" {
   function_name    = "lambda_determine_processing_file_type"
   role             = aws_iam_role.lambda_role_determine_processing_file_type.arn
   handler          = "index.lambda_handler"
-  runtime          = "python3.8"
+  runtime          = "python3.9"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip_determine_processing_file_type.output_path)
 
   # environment {
@@ -92,7 +92,7 @@ resource "aws_lambda_function" "lambda_extract_using_textract" {
   function_name    = "lambda_extract_using_textract"
   role             = aws_iam_role.lambda_role_extract_using_textract.arn
   handler          = "index.lambda_handler"
-  runtime          = "python3.8"
+  runtime          = "python3.9"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip_extract_using_textract.output_path)
 
   environment {
@@ -153,7 +153,7 @@ resource "aws_lambda_function" "lambda_extract_using_bedrock" {
   function_name    = "lambda_extract_using_bedrock"
   role             = aws_iam_role.lambda_role_extract_using_bedrock.arn
   handler          = "index.lambda_handler"
-  runtime          = "python3.8"
+  runtime          = "python3.9"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip_extract_using_bedrock.output_path)
 
   environment {
@@ -213,7 +213,7 @@ resource "aws_lambda_function" "lambda_extract_tables_from_excel" {
   function_name    = "lambda_extract_tables_from_excel"
   role             = aws_iam_role.lambda_role_extract_tables_from_excel.arn
   handler          = "index.lambda_handler"
-  runtime          = "python3.8"
+  runtime          = "python3.9"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip_extract_tables_from_excel.output_path)
 
   environment {
@@ -269,7 +269,7 @@ resource "aws_lambda_function" "lambda_process_tables_using_bedrock" {
   function_name    = "lambda_process_tables_using_bedrock"
   role             = aws_iam_role.lambda_role_process_tables_using_bedrock.arn
   handler          = "index.lambda_handler"
-  runtime          = "python3.8"
+  runtime          = "python3.9"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip_process_tables_using_bedrock.output_path)
 
   environment {
@@ -328,7 +328,7 @@ resource "aws_lambda_function" "lambda_gather_document_details" {
   function_name    = "lambda_gather_document_details"
   role             = aws_iam_role.lambda_role_gather_document_details.arn
   handler          = "index.lambda_handler"
-  runtime          = "python3.8"
+  runtime          = "python3.9"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip_gather_document_details.output_path)
 
   environment {
@@ -340,4 +340,59 @@ resource "aws_lambda_function" "lambda_gather_document_details" {
 
 output "lambda_function_gather_document_details_arn" {
   value = aws_lambda_function.lambda_gather_document_details.arn
+}
+
+
+
+
+
+
+
+
+
+resource "aws_iam_role" "lambda_role_merge_document_extractions" {
+  name = "lambda-role-merge-document-extractions"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_attachment_merge_document_extractions" {
+  role       = aws_iam_role.lambda_role_merge_document_extractions.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+data "archive_file" "lambda_zip_merge_document_extractions" {
+  type        = "zip"
+  source_file = "${path.module}/lambdas/merge-document-extractions/index.py"
+  output_path = "${path.module}/lambdas/merge-document-extractions/index.zip"
+}
+
+resource "aws_lambda_function" "lambda_merge_document_extractions" {
+  filename         = data.archive_file.lambda_zip_merge_document_extractions.output_path
+  function_name    = "lambda_merge_document_extractions"
+  role             = aws_iam_role.lambda_role_merge_document_extractions.arn
+  handler          = "index.lambda_handler"
+  runtime          = "python3.9"
+  source_code_hash = filebase64sha256(data.archive_file.lambda_zip_merge_document_extractions.output_path)
+
+  environment {
+    variables = {
+      ENV_VAR = "value"
+    }
+  }
+}
+
+output "lambda_function_merge_document_extractions_arn" {
+  value = aws_lambda_function.lambda_merge_document_extractions.arn
 }
