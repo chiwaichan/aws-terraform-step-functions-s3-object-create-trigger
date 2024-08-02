@@ -271,7 +271,7 @@ resource "aws_iam_policy" "lambda_s3_policy_extract_tables_from_excel" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment_extract_tables_from_excel" {
   role       = aws_iam_role.lambda_role_extract_tables_from_excel.name
   policy_arn = aws_iam_policy.lambda_s3_policy_extract_tables_from_excel.arn
 }
@@ -502,6 +502,34 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment_save_process
   role       = aws_iam_role.lambda_role_save_processing_notes.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+
+
+resource "aws_iam_policy" "lambda_s3_policy_save_processing_notes" {
+  name        = "lambda-s3-policy-save-processing-notes"
+  description = "IAM policy for Lambda to access S3 bucket"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl"
+        ]
+        Resource = "arn:aws:s3:::${aws_s3_bucket.output_document_bucket.bucket}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment_save_processing_notes" {
+  role       = aws_iam_role.lambda_role_save_processing_notes.name
+  policy_arn = aws_iam_policy.lambda_s3_policy_save_processing_notes.arn
+}
+
+
+
+
 
 data "archive_file" "lambda_zip_save_processing_notes" {
   type        = "zip"
