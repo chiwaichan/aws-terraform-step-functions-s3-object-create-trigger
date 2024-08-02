@@ -1,8 +1,14 @@
 import json
 
-def lambda_handler(event, context):
-    event["processing_notes"].append(f'Gathered document details.')
-    event["description"] = "A description"
+def lambda_handler(events, context):
+    result = events[0]
 
-    return event
+    # Iterate over the rest of the array
+    for event in events:
+        for sub_processing_note in event["sub_processing_notes"]:
+            result["processing_notes"].append(sub_processing_note)
+
+    del result['sub_processing_notes']
+
+    return result
 

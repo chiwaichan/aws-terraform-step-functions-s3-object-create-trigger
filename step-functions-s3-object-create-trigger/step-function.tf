@@ -113,7 +113,7 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
         },
         "Merge Document Extractions": {
           "Type": "Task",
-          "Resource": "${aws_lambda_function.lambda_process_tables_using_bedrock.arn}",
+          "Resource": "${aws_lambda_function.lambda_merge_document_extractions.arn}",
           "Next": "Process Tables Using Bedrock"
         },
         "Process Tables Using Bedrock": {
