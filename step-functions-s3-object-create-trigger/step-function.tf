@@ -82,7 +82,7 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
         },
         "Gather Document Details": {
           "Type": "Task",
-          "Resource": "${aws_lambda_function.lambda_extract_using_textract.arn}",
+          "Resource": "${aws_lambda_function.lambda_gather_document_details.arn}",
           "Next": "Parallel Document Extraction"
         },
         "Parallel Document Extraction": {

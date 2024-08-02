@@ -282,3 +282,62 @@ resource "aws_lambda_function" "lambda_process_tables_using_bedrock" {
 output "lambda_function_process_tables_using_bedrock_arn" {
   value = aws_lambda_function.lambda_process_tables_using_bedrock.arn
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+resource "aws_iam_role" "lambda_role_gather_document_details" {
+  name = "lambda-role-gather-document-details"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_attachment_gather_document_details" {
+  role       = aws_iam_role.lambda_role_gather_document_details.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+data "archive_file" "lambda_zip_gather_document_details" {
+  type        = "zip"
+  source_file = "${path.module}/lambdas/gather-document-details/index.py"
+  output_path = "${path.module}/lambdas/gather-document-details/index.zip"
+}
+
+resource "aws_lambda_function" "lambda_gather_document_details" {
+  filename         = data.archive_file.lambda_zip_gather_document_details.output_path
+  function_name    = "lambda_gather_document_details"
+  role             = aws_iam_role.lambda_role_gather_document_details.arn
+  handler          = "index.lambda_handler"
+  runtime          = "python3.8"
+  source_code_hash = filebase64sha256(data.archive_file.lambda_zip_gather_document_details.output_path)
+
+  environment {
+    variables = {
+      ENV_VAR = "value"
+    }
+  }
+}
+
+output "lambda_function_gather_document_details_arn" {
+  value = aws_lambda_function.lambda_gather_document_details.arn
+}
