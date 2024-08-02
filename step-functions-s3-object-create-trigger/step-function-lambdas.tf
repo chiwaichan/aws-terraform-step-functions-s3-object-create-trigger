@@ -202,6 +202,33 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment_extract_tabl
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+
+
+resource "aws_iam_policy" "lambda_s3_policy" {
+  name        = "lambda-s3-policy"
+  description = "IAM policy for Lambda to access S3 bucket"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl"
+        ]
+        Resource = "arn:aws:s3:::${aws_s3_bucket.output_document_bucket.bucket}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment" {
+  role       = aws_iam_role.lambda_role_extract_tables_from_excel.name
+  policy_arn = aws_iam_policy.lambda_s3_policy.arn
+}
+
+
+
 data "archive_file" "lambda_zip_extract_tables_from_excel" {
   type        = "zip"
   source_file = "${path.module}/lambdas/extract-tables-from-excel/index.py"
@@ -218,7 +245,7 @@ resource "aws_lambda_function" "lambda_extract_tables_from_excel" {
 
   environment {
     variables = {
-      ENV_VAR = "value"
+      OUTPUT_BUCKET_NAME = aws_s3_bucket.output_document_bucket.bucket
     }
   }
 }
