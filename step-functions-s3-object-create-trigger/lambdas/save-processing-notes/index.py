@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     
     # Create an in-memory output file
     output = io.StringIO()
-    output.write(event["processing_notes"].join("\n"))
+    output.write("\n".join(event["processing_notes"]))
     key = f'{event["source-document"]}/processing-notes.txt'
     # Upload the file to S3
     s3_client.put_object(
