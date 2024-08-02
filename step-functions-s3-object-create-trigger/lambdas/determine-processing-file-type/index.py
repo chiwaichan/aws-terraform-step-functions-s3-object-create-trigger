@@ -1,17 +1,22 @@
 import json
 
 def lambda_handler(event, context):
-    # Log the input event
-    print("Received event:", json.dumps(event))
-
-    # You can add specific checks or logic based on the event data
-    # For demonstration, let's assume we check for a specific key
-    if 'key_to_check' in event:
-        response_message = f"Received key_to_check: {event['key_to_check']}"
+    # Extract the source-document from the event
+    source_document = event.get("source-document", "").lower()
+    
+    # Determine the file extension and set next_step_file_type accordingly
+    if source_document.endswith((".xlsx", ".xls", ".xlsm", ".xlsb", ".xltx", ".xltm")):
+        next_step_file_type = "EXCEL"
+    elif source_document.endswith(".pdf"):
+        next_step_file_type = "PDF"
     else:
-        response_message = "No key_to_check found in the event."
-
+        next_step_file_type = "UNKNOWN"
+    
     return {
-        'statusCode': 200,
-        'body': json.dumps(response_message)
+        "next_step_file_type": next_step_file_type
     }
+
+# For testing purposes:
+if __name__ == "__main__":
+    event = {"source-document": "app_table.xlsx"}
+    print(lambda_handler(event, None))
