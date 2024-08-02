@@ -59,9 +59,9 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
     "Determine Processing File Type": {
       "Type": "Task",
       "Resource": "${aws_lambda_function.lambda_determine_processing_file_type.arn}",
-      "Next": "DetermineNextStepFileType"
+      "Next": "Determine Next Step File Type Choice"
     },
-    "DetermineNextStepFileType": {
+    "Determine Next Step File Type Choice": {
       "Type": "Choice",
       "Choices": [
         {
