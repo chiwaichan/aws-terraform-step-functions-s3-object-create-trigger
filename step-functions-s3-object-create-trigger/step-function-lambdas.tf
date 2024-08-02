@@ -396,3 +396,58 @@ resource "aws_lambda_function" "lambda_merge_document_extractions" {
 output "lambda_function_merge_document_extractions_arn" {
   value = aws_lambda_function.lambda_merge_document_extractions.arn
 }
+
+
+
+
+
+
+
+
+
+resource "aws_iam_role" "lambda_role_save_processing_notes" {
+  name = "lambda-role-save-processing-notes"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_attachment_save_processing_notes" {
+  role       = aws_iam_role.lambda_role_save_processing_notes.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+data "archive_file" "lambda_zip_save_processing_notes" {
+  type        = "zip"
+  source_file = "${path.module}/lambdas/save-processing-notes/index.py"
+  output_path = "${path.module}/lambdas/save-processing-notes/index.zip"
+}
+
+resource "aws_lambda_function" "lambda_save_processing_notes" {
+  filename         = data.archive_file.lambda_zip_save_processing_notes.output_path
+  function_name    = "lambda_save_processing_notes"
+  role             = aws_iam_role.lambda_role_save_processing_notes.arn
+  handler          = "index.lambda_handler"
+  runtime          = "python3.8"
+  source_code_hash = filebase64sha256(data.archive_file.lambda_zip_save_processing_notes.output_path)
+
+  environment {
+    variables = {
+      ENV_VAR = "value"
+    }
+  }
+}
+
+output "lambda_function_save_processing_notes_arn" {
+  value = aws_lambda_function.lambda_save_processing_notes.arn
+}
