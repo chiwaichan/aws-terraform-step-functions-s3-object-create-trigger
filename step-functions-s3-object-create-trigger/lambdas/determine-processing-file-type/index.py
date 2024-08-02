@@ -12,9 +12,10 @@ def lambda_handler(event, context):
     else:
         next_step_file_type = "UNKNOWN"
     
-    return {
-        "next_step_file_type": next_step_file_type
-    }
+    event["next_step_file_type"] = next_step_file_type
+    event["processing_notes"] = [f'Found file with extension: {next_step_file_type}']
+
+    return event
 
 # For testing purposes:
 if __name__ == "__main__":
