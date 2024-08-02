@@ -78,7 +78,7 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
         "Extract Tables from Excel": {
           "Type": "Task",
           "Resource": "${aws_lambda_function.lambda_extract_tables_from_excel.arn}",
-          "Next": "Report Result"
+          "Next": "Process Tables Using Bedrock"
         },
         "Gather Document Details": {
           "Type": "Task",
@@ -109,9 +109,13 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
               }
             }
           ],
+          "Next": "Process Tables Using Bedrock"
+        },
+        "Process Tables Using Bedrock": {
+          "Type": "Task",
+          "Resource": "${aws_lambda_function.lambda_process_tables_using_bedrock.arn}",
           "Next": "Report Result"
         },
-       
         "Report Result": {
           "Type": "Task",
           "Resource": "arn:aws:states:::sns:publish",
