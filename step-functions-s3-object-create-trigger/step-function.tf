@@ -72,15 +72,20 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
         {
           "Variable": "$.next_step_file_type",
           "StringEquals": "PDF",
-          "Next": "Extract Document using Textract"
+          "Next": "Gather Document Details"
         }
       ],
-      "Default": "Extract Document using Textract"
+      "Default": "Gather Document Details"
     },
     "Extract Tables from Excel": {
       "Type": "Task",
       "Resource": "${aws_lambda_function.lambda_extract_tables_from_excel.arn}",
       "Next": "Extract Document using Bedrock"
+    },
+    "Gather Document Details": {
+      "Type": "Task",
+      "Resource": "${aws_lambda_function.lambda_extract_using_textract.arn}",
+      "Next": "Extract Document using Textract"
     },
     "Extract Document using Textract": {
       "Type": "Task",
