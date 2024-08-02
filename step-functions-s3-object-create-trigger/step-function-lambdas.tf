@@ -144,8 +144,8 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment_extract_usin
 
 data "archive_file" "lambda_zip_extract_using_bedrock" {
   type        = "zip"
-  source_file = "${path.module}/lambdas/extract-using-textract/index.py"
-  output_path = "${path.module}/lambdas/extract-using-textract/index.zip"
+  source_file = "${path.module}/lambdas/extract-using-bedrock/index.py"
+  output_path = "${path.module}/lambdas/extract-using-bedrock/index.zip"
 }
 
 resource "aws_lambda_function" "lambda_extract_using_bedrock" {
