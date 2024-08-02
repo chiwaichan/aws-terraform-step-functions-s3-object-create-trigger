@@ -119,17 +119,11 @@ resource "aws_sfn_state_machine" "document_processing_state_machine" {
         "Process Tables Using Bedrock": {
           "Type": "Task",
           "Resource": "${aws_lambda_function.lambda_process_tables_using_bedrock.arn}",
-          "Next": "Report Result"
+          "Next": "Save Processing Notes"
         },
-        "Report Result": {
+        "Save Processing Notes": {
           "Type": "Task",
-          "Resource": "arn:aws:states:::sns:publish",
-          "Parameters": {
-            "TopicArn": "arn:aws:sns:ap-southeast-2:177522612043:StepFunctionsSample-HelloLambda-13b053f3-12a8-41a6-aafc-1c4626d419a4-ReportResultSnsTopic-cCmbP4y6wZER",
-            "Message": {
-              "Input.$": "$"
-            }
-          },
+          "Resource": "${aws_lambda_function.lambda_save_processing_notes.arn}",
           "End": true
         }
       }

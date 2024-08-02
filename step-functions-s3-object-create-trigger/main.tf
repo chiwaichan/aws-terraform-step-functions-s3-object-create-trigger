@@ -7,6 +7,10 @@ resource "aws_s3_bucket" "source_document_bucket" {
   bucket = "source-document-bucket-name-here"
 }
 
+resource "aws_s3_bucket" "output_document_bucket" {
+  bucket = "output-document-bucket-name-here"
+}
+
 # IAM Role for Lambda
 resource "aws_iam_role" "lambda_role_start_step_function_execution" {
   name = "lambda-s3-role"
