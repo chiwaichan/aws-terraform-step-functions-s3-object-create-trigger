@@ -36,7 +36,7 @@ resource "aws_lambda_function" "lambda_determine_processing_file_type" {
 
   environment {
     variables = {
-      ENV_VAR = "value"
+      SOURCE_DOCUMENT_S3_BUCKET = aws_s3_bucket.source_document_bucket.bucket
     }
   }
 }
